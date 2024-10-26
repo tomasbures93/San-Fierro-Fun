@@ -4,6 +4,8 @@
 
 #define WHITE 0xFFFFFFAA
 
+new Text:version;
+
 main()
 {
 	print("\n----------------------------------");
@@ -22,11 +24,19 @@ public OnGameModeInit()
 	AddPlayerClass(0,-1166.0553,30.2264,14.1484,277.2402,0,0,0,0,0,0);
 	AddStaticVehicle(411, -1162.1776,35.5443,14.1484,129.6587,0, 1);
 	AddStaticVehicle(495, -1163.0609,27.4130,14.1484,43.1779, 0, 1);
+
+	version = TextDrawCreate(590.0, 430.0, "v0.0.1a");
+	TextDrawFont(version, 1);
+    TextDrawLetterSize(version, 0.3, 1.0);
+    TextDrawColor(version, WHITE); 
+    TextDrawSetOutline(version, 1);
+    TextDrawSetProportional(version, 1);
 	return 1;
 }
 
 public OnGameModeExit()
 {
+	TextDrawDestroy(version);
 	return 1;
 }
 
@@ -42,11 +52,12 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerConnect(playerid)
 {
-    SendClientMessage(playerid,WHITE,"Welcome to server");
     new player[100];
     GetPlayerName(playerid, player, 24);
     format(player, 100, "[SYSTEM] %s is here!", player);
     SendClientMessageToAll(WHITE,player);
+
+	TextDrawShowForPlayer(playerid, version);
 	return 1;
 }
 
@@ -101,6 +112,10 @@ public OnPlayerCommandText(playerid, cmdtext[])
         SetPlayerHealth(playerid, 0);
     return 1;
     }
+	if(strcmp(cmdtext, "/textupdate", true) == 0){
+        TextDrawSetString(version, "New Text");
+    return 1;
+    }
 	return 0;
 }
 
@@ -109,7 +124,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 	new message[100];
 	new Float:vehicle_HP;
 	GetVehicleHealth(vehicleid, vehicle_HP);
-    format(message, sizeof(message), "[SYSTEM] Status of vehicle: %.0f \%", vehicle_HP);
+    format(message, sizeof(message), "[SYSTEM] Status of vehicle: %.0f ", vehicle_HP);
     SendClientMessage(playerid, 0xFFFFFFFF, message);
 	return 1;
 }
