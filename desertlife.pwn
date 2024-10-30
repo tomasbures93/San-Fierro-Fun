@@ -16,14 +16,16 @@ new Text:Test;
 
 //pickups
 new trucksfdocks;
-
+new jobpickup[MAX_PLAYERS];
+new pickuppickup[MAX_PLAYERS];
 // Dialogs
 enum
 {
     DIALOG_LOGIN,
     DIALOG_WELCOME,
     DIALOG_WEAPONS,
-	DIALOG_JOBS
+	DIALOG_JOBS,
+	DIALOG_JOB_TRUCKER
 }
 #define DIALOG_LOGIN 1
 #define DIALOG_WELCOME 2
@@ -48,25 +50,27 @@ public OnGameModeInit()
 	AddStaticVehicle(411, -1162.1776,35.5443,14.1484,129.6587,0, 1);
 	AddStaticVehicle(495, -1163.0609,27.4130,14.1484,43.1779, 0, 1);
 	// Trucks SF Docks - Truck ID 515 , Trailer ID 435 for missions
-	AddStaticVehicle(515,-1736.7004,0.6265,5.2760,0.8750,1,1);
-	AddStaticVehicle(515,-1714.7683,-8.4339,5.3044,38.0566,1,1);
-	AddStaticVehicle(515,-1574.0729,129.9238,4.5714,136.8015,1,1);
-	AddStaticVehicle(515,-1591.1049,111.7881,4.5808,136.7738,1,1); 
-	AddStaticVehicle(515,-1605.5150,96.4574,4.5648,136.7756,1,1); 
-	AddStaticVehicle(515,-1725.0200,4.9415,4.6118,40.2715,1,1); 
-	AddStaticVehicle(435,-1693.2036,95.2051,4.2818,135.4469,1,1); 
-	AddStaticVehicle(435,-1698.0519,97.9644,4.5761,135.6089,1,1);
-	AddStaticVehicle(435,-1701.2671,101.6751,4.5719,135.2610,1,1); 
-	AddStaticVehicle(435,-1706.7643,106.3703,4.5758,135.5140,1,1); 
-	AddStaticVehicle(435,-1714.3096,63.5763,4.5724,44.5770,1,1); 
-	AddStaticVehicle(435,-1554.5771,135.4863,4.5809,134.1101,1,1); 
-	// Trucks upper SF Docks - Truck ID 403 , Trailer ID 591 for missions
-	AddStaticVehicle(403,-1852.4331,167.9211,15.8443,180.3650,0,0);
-	AddStaticVehicle(403,-1842.7319,167.3891,15.8443,180.6638,0,0); 
-	AddStaticVehicle(591,-1856.9109,121.9408,14.8443,1.1350,0,0);
-	AddStaticVehicle(591,-1844.2953,120.0702,14.8443,357.8600,0,0);
+	AddStaticVehicle(515,-1647.5753,10.4159,4.5717,44.4010,1,1); 
+	AddStaticVehicle(515,-1651.5116,6.7247,4.5712,42.9010,1,1); 
+	AddStaticVehicle(515,-1655.7568,2.6430,4.5678,42.9431,1,1); 
+	AddStaticVehicle(515,-1659.9255,-1.4529,4.5700,44.5571,1,1); 
+	AddStaticVehicle(515,-1630.2097,70.4724,4.5737,176.7814,1,1); 
+	AddStaticVehicle(515,-1623.8671,77.0643,4.5758,180.3049,1,1); 
+	AddStaticVehicle(515,-1617.1459,84.3643,4.5759,182.5267,1,1); 
+	AddStaticVehicle(515,-1610.7916,91.3931,4.5731,184.0389,1,1); 
+	AddStaticVehicle(515,-1731.7963,2.5310,4.5748,2.1874,1,1); 
+	AddStaticVehicle(435,-1700.8362,104.6634,4.5758,142.6419,1,1);
+	AddStaticVehicle(435,-1713.5856,64.1006,4.5694,46.1683,1,1);
+	AddStaticVehicle(435,-1707.0029,12.4028,4.5788,316.3098,1,1); 
+	AddStaticVehicle(435,-1690.8182,96.3132,4.5716,86.0747,1,1); 
+	AddStaticVehicle(435,-1695.9539,91.3294,4.5722,83.7602,1,1); 
+	AddStaticVehicle(435,-1700.5251,86.3879,4.5711,86.3353,1,1); 
+	AddStaticVehicle(435,-1705.3693,81.7890,4.5749,85.8162,1,1); 
+	AddStaticVehicle(435,-1710.0132,77.1295,4.5764,85.5209,1,1); 
+	AddStaticVehicle(435,-1704.3184,109.1280,4.5889,141.1323,1,1); 
 	// Pickups - Jobs
 	trucksfdocks = CreatePickup(1239, 1, -1732.1434,36.2360,3.5, -1); // Trucker SF Docks
+	Create3DTextLabel("Job: Trucker SF Docks \n Pay: 500$ \n Missions: Yes", SYS_OK, -1732.1434,36.2360,4.5, 40.0, 0, 0);
 	// Version TextDraw
 	version = TextDrawCreate(590.0, 430.0, modversion);
 	TextDrawFont(version, 1);
@@ -111,6 +115,10 @@ public OnPlayerConnect(playerid)
     format(player, 100, "[SYSTEM] %s is here!", player);
     SendClientMessageToAll(SYS_OK,player);
 	TextDrawShowForPlayer(playerid, version);
+	// Variables
+	jobpickup[playerid] = 0;
+	pickuppickup[playerid] = 0;
+	// Map Icons
 	SetPlayerMapIcon(playerid, 1, -1732.1434,36.2360,3.5547, 51, SYS_WHITE, 1);
 	return 1;
 }
@@ -264,8 +272,14 @@ public OnPlayerObjectMoved(playerid, objectid)
 
 public OnPlayerPickUpPickup(playerid, pickupid)
 {
+	if (pickuppickup[playerid] == 1) {
+		return 1;
+	} 
 	if(pickupid == trucksfdocks){
-		SendClientMessage(playerid, SYS_OK, "Pickup picked up");
+		TogglePlayerControllable(playerid, false);
+		jobpickup[playerid] = 1;
+		pickuppickup[playerid] = 1;
+		ShowPlayerDialog(playerid, DIALOG_JOB_TRUCKER, DIALOG_STYLE_LIST, "Trucker", "Info\nMissions\nJoin", "Ok", "Cancel");
 	}
 	return 1;
 }
@@ -335,6 +349,7 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 	return 1;
 }
 
+
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(dialogid == DIALOG_JOBS){
@@ -345,10 +360,50 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			SendClientMessage(playerid, SYS_OK, message);
 		}
 	}
+	if(dialogid == DIALOG_JOB_TRUCKER && response){
+		if(jobpickup[playerid] == 1){
+			switch(listitem){
+				case 0: {
+					TogglePlayerControllable(playerid, true);
+					SendClientMessage(playerid, SYS_OK, "Info");
+					SetTimerEx("pickupreset", 15000, false, "i", playerid);
+				}
+				case 1: {
+					TogglePlayerControllable(playerid, true);
+					SendClientMessage(playerid, SYS_OK, "Missions");
+					SetTimerEx("pickupreset", 15000, false, "i", playerid);
+				}
+				case 2: {
+					TogglePlayerControllable(playerid, true);
+					SendClientMessage(playerid, SYS_OK, "Join");
+					SetTimerEx("pickupreset", 15000, false, "i", playerid);
+				}
+			}
+				
+		}
+	}
 	return 1;
 }
 
 public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 {
+	new string[128], title[64], info[256];
+	new Float:x, Float:y, Float:z;
+	new ping = GetPlayerPing(playerid);
+	new name[MAX_PLAYER_NAME];
+	GetPlayerPos(playerid, x, y, z);
+	GetPlayerName(clickedplayerid, name, sizeof(name));
+    format(string, sizeof(string), "You clicked on %s (ID: %d)", name, clickedplayerid);
+    SendClientMessage(playerid, SYS_OK, string);
+	format(title, sizeof(title), "Info about player");
+	format(info, sizeof(info), "Name: %s (ID: %d)\nPing: %d ms\nPosition: X %0.4f Y %0.4f Z %0.4f\nPickuppicked %d", name, clickedplayerid, ping, x, y, z, pickuppickup[playerid]);
+	ShowPlayerDialog(playerid, DIALOG_WELCOME, DIALOG_STYLE_MSGBOX, title, info, "OK", "");
 	return 1;
+}
+
+//extras
+forward pickupreset(playerid);
+public pickupreset(playerid) {
+	pickuppickup[playerid] = 0;
+	SendClientMessage(playerid, SYS_WARNING, "Timer RESET");
 }
