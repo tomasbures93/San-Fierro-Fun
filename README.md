@@ -1,5 +1,5 @@
 <h1>San Fierro Fun - SA-MP mod</h1>
-Server mod for <b>SA-MP</b> version <b>v0.3.7-R2</b>
+Server mod for <b>SA-MP v0.3.7-R2</b>
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/BurcisWolf/San-Fierro-Fun) ![Static Badge](https://img.shields.io/badge/version-0.0.1a-orange) ![GitHub top language](https://img.shields.io/github/languages/top/BurcisWolf/San-Fierro-Fun)
  ![GitHub forks](https://img.shields.io/github/forks/BurcisWolf/San-Fierro-Fun)
