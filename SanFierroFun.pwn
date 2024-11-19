@@ -1,6 +1,6 @@
 #include <a_samp>
 
-new modversion[20] = "v0.0.2a";
+new modversion[20] = "v0.0.3a";
 
 #pragma tabsize 0
 
