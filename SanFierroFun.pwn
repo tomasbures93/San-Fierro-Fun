@@ -4,20 +4,27 @@ new modversion[20] = "v0.0.2a";
 
 #pragma tabsize 0
 
-//colors
+// colors
 #define SYS_WHITE 0xFFFFFFAA
 #define SYS_PROBLEM 0xff0000AA
 #define SYS_OK 0x00ff00AA
 #define SYS_WARNING 0xff9100AA
 
-//TextDraws
+// TextDraws
 new Text:version;
 new Text:Test;
 
-//pickups
+// pickups - transport
+new sfairport;
+new sftrain;
+
+// pickups - work
 new trucksfdocks;
+
+// others
 new jobpickup[MAX_PLAYERS];
 new pickuppickup[MAX_PLAYERS];
+
 // Dialogs
 enum
 {
@@ -25,6 +32,7 @@ enum
     DIALOG_WELCOME,
     DIALOG_WEAPONS,
 	DIALOG_JOBS,
+	DIALOG_TP,
 	DIALOG_JOB_TRUCKER
 }
 #define DIALOG_LOGIN 1
@@ -47,8 +55,8 @@ public OnGameModeInit()
     DisableInteriorEnterExits();
     //AllowInteriorWeapons(1);
 	AddPlayerClass(0,-1166.0553,30.2264,14.1484,277.2402,0,0,0,0,0,0);
-	AddStaticVehicle(411, -1162.1776,35.5443,14.1484,129.6587,0, 1);
-	AddStaticVehicle(495, -1163.0609,27.4130,14.1484,43.1779, 0, 1);
+	AddStaticVehicle(411, -1990.0114,186.7471,27.5391,353.3199,0, 1);
+	AddStaticVehicle(495, -1988.7845,138.8985,27.5391,181.3216, 0, 1);
 	// Trucks SF Docks - Truck ID 515 , Trailer ID 435 for missions
 	AddStaticVehicle(515,-1647.5753,10.4159,4.5717,44.4010,1,1); 
 	AddStaticVehicle(515,-1651.5116,6.7247,4.5712,42.9010,1,1); 
@@ -68,8 +76,11 @@ public OnGameModeInit()
 	AddStaticVehicle(435,-1705.3693,81.7890,4.5749,85.8162,1,1); 
 	AddStaticVehicle(435,-1710.0132,77.1295,4.5764,85.5209,1,1); 
 	AddStaticVehicle(435,-1704.3184,109.1280,4.5889,141.1323,1,1); 
+	// Transport Pickups
+	sfairport = CreatePickup(1239, 1, -1423.3116,-289.1021,14.1484, -1);
+	sftrain = CreatePickup(1239, 1, -1973.3477,118.4421,27.6875, -1);
 	// Pickups - Jobs
-	trucksfdocks = CreatePickup(1239, 1, -1732.1434,36.2360,3.5, -1); // Trucker SF Docks
+	trucksfdocks = CreatePickup(1274, 1, -1732.1434,36.2360,3.5, -1); // Trucker SF Docks
 	Create3DTextLabel("Job: Trucker SF Docks \n Pay: 500$ \n Missions: Yes", SYS_OK, -1732.1434,36.2360,4.5, 40.0, 0, 0);
 	// Version TextDraw
 	version = TextDrawCreate(590.0, 430.0, modversion);
@@ -120,6 +131,7 @@ public OnPlayerConnect(playerid)
 	pickuppickup[playerid] = 0;
 	// Map Icons
 	SetPlayerMapIcon(playerid, 1, -1732.1434,36.2360,3.5547, 51, SYS_WHITE, 1);
+	SetPlayerMapIcon(playerid, 2, -1423.3116,-289.1021,14.1484, 5, SYS_WHITE, 1);
 	return 1;
 }
 
@@ -138,8 +150,9 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-    SetPlayerPos(playerid, -1176.8077,14.9178,14.1484);
-	SetPlayerFacingAngle(playerid, 41.6112);
+    SetPlayerPos(playerid, -1973.8416,159.3786,27.6940);
+	SetPlayerFacingAngle(playerid, 182.5750);
+	GivePlayerMoney(playerid, 1000);
 	return 1;
 }
 
@@ -175,7 +188,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
     return 1;
     }
 	if(strcmp(cmdtext, "/jobs", true) == 0){
-        ShowPlayerDialog(playerid, DIALOG_JOBS, DIALOG_STYLE_TABLIST, "Jobs", "Trucker\tSF Docks\tNO REWARD", "Select", "Cancel");
+        ShowPlayerDialog(playerid, DIALOG_JOBS, DIALOG_STYLE_TABLIST, "Job Teleports", "Trucker\tSF Docks\tNO REWARD", "Select", "Cancel");
+    return 1;
+    }
+	if(strcmp(cmdtext, "/tp", true) == 0){
+        ShowPlayerDialog(playerid, DIALOG_TP, DIALOG_STYLE_TABLIST, "Teleports", "San Fierro Airport\tFree\nSan Fierro Train Station\tFree\nSan Fierro Fire Department \tFree", "Select", "Cancel");
     return 1;
     }
 	if(strcmp(cmdtext, "/msgbox", true) == 0){
@@ -281,6 +298,12 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		pickuppickup[playerid] = 1;
 		ShowPlayerDialog(playerid, DIALOG_JOB_TRUCKER, DIALOG_STYLE_LIST, "Trucker", "Info\nMissions\nJoin", "Ok", "Cancel");
 	}
+	if(pickupid == sfairport){
+		SendClientMessage(playerid, SYS_OK, "SF Airport pickup");
+	}
+	if(pickupid == sftrain){
+		SendClientMessage(playerid, SYS_OK, "SF Train pickup");
+	}
 	return 1;
 }
 
@@ -359,6 +382,31 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			SetPlayerPos(playerid, -1736.7004,0.6265,10.2760);
 			SendClientMessage(playerid, SYS_OK, message);
 		}
+	}
+	if(dialogid == DIALOG_TP){
+		new message[50];
+		format(message, sizeof(message), "[SYSTEM] Teleported to %s", inputtext);
+		switch(listitem){
+			case 0: {
+
+				SetPlayerPos(playerid, -1433.7793,-281.6175,14.1484);
+				SetPlayerFacingAngle(playerid, 136.1181);
+				SendClientMessage(playerid, SYS_OK, message);
+			}
+			case 1: {
+
+				SetPlayerPos(playerid, -1973.8416,159.3786,27.6940);
+				SetPlayerFacingAngle(playerid, 182.5750);
+				SendClientMessage(playerid, SYS_OK, message);
+			}
+			case 2: {
+				
+				SetPlayerPos(playerid, -2015.4547,64.9303,29.3113);
+				SetPlayerFacingAngle(playerid, 79.9318);
+				SendClientMessage(playerid, SYS_OK, message);
+			}
+		}
+		
 	}
 	if(dialogid == DIALOG_JOB_TRUCKER && response){
 		if(jobpickup[playerid] == 1){
