@@ -20,10 +20,13 @@ new sftrain;
 
 // pickups - work
 new trucksfdocks;
+new sfnews;
+new paramedics;
 
 // others
 new jobpickup[MAX_PLAYERS];
 new pickuppickup[MAX_PLAYERS];
+new heal;
 
 // Dialogs
 enum
@@ -48,7 +51,7 @@ main()
 
 public OnGameModeInit()
 {
-	SetGameModeText("San Fierro Fun");
+	SetGameModeText("San Fierro Fun v0.0.3a");
     UsePlayerPedAnims();
     ShowPlayerMarkers(1);
     ShowNameTags(1);
@@ -80,8 +83,14 @@ public OnGameModeInit()
 	sfairport = CreatePickup(1239, 1, -1423.3116,-289.1021,14.1484, -1);
 	sftrain = CreatePickup(1239, 1, -1973.3477,118.4421,27.6875, -1);
 	// Pickups - Jobs
-	trucksfdocks = CreatePickup(1274, 1, -1732.1434,36.2360,3.5, -1); // Trucker SF Docks
+	trucksfdocks = CreatePickup(1274, 1, -1732.1434,36.2360,3.5, -1); 
 	Create3DTextLabel("Job: Trucker SF Docks \n Pay: 500$ \n Missions: Yes", SYS_OK, -1732.1434,36.2360,4.5, 40.0, 0, 0);
+	paramedics = CreatePickup(1274, 1, -2654.6199,636.0464,14.4531, -1);
+	Create3DTextLabel("Job: Paramedics \n Pay: 500$ \n Missions: Yes", SYS_OK, -2654.6199,636.0464,14.4531, 40.0, 0, 0);
+	sfnews = CreatePickup(1274, 1, -2528.2813,-622.9222,132.7544, -1);
+	Create3DTextLabel("Job: San Fierro News \n Pay: 500$ \n Missions: Yes", SYS_OK, -2528.2813,-622.9222,132.7544, 40.0, 0, 0);
+	// others
+	heal = CreatePickup(1240, 1, -2665.9292,635.5607,14.4531, -1);
 	// Version TextDraw
 	version = TextDrawCreate(590.0, 430.0, modversion);
 	TextDrawFont(version, 1);
@@ -130,8 +139,10 @@ public OnPlayerConnect(playerid)
 	jobpickup[playerid] = 0;
 	pickuppickup[playerid] = 0;
 	// Map Icons
-	SetPlayerMapIcon(playerid, 1, -1732.1434,36.2360,3.5547, 51, SYS_WHITE, 1);
-	SetPlayerMapIcon(playerid, 2, -1423.3116,-289.1021,14.1484, 5, SYS_WHITE, 1);
+	SetPlayerMapIcon(playerid, 1, -1732.1434,36.2360,3.5547, 51, SYS_WHITE, 1);		// SF docks trucker
+	SetPlayerMapIcon(playerid, 2, -1423.3116,-289.1021,14.1484, 5, SYS_WHITE, 1);	// airport
+	SetPlayerMapIcon(playerid, 3, -2654.6199,636.0464,14.4531, 22, SYS_WHITE, 1); 	// paramedics
+	SetPlayerMapIcon(playerid, 4, -1050.9052,-592.9783,32.0078, 51, SYS_WHITE, 1);		// Petrol trucker
 	return 1;
 }
 
@@ -188,11 +199,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
     return 1;
     }
 	if(strcmp(cmdtext, "/jobs", true) == 0){
-        ShowPlayerDialog(playerid, DIALOG_JOBS, DIALOG_STYLE_TABLIST, "Job Teleports", "Trucker\tSF Docks\tNO REWARD", "Select", "Cancel");
+        ShowPlayerDialog(playerid, DIALOG_JOBS, DIALOG_STYLE_TABLIST, "Job Teleports", "Trucker SF Docks\tNO REWARD\nFire Department\tNO REWARD\nPolice Station\tNO REWARD\nMilitary\tNO REWARD\nTrucker Petrol Tanks\tNO REWARD\nSan Fierro News\tNO REWARD\nParamedics\tNO REWARD", "Select", "Cancel");
     return 1;
     }
 	if(strcmp(cmdtext, "/tp", true) == 0){
-        ShowPlayerDialog(playerid, DIALOG_TP, DIALOG_STYLE_TABLIST, "Teleports", "San Fierro Airport\tFree\nSan Fierro Train Station\tFree\nSan Fierro Fire Department \tFree", "Select", "Cancel");
+        ShowPlayerDialog(playerid, DIALOG_TP, DIALOG_STYLE_TABLIST, "Teleports", "San Fierro Airport\tFree\nSan Fierro Train Station\tFree\nRepair Shop (Train Station)\tFree\nStadium San Fierro\tFree\nGolf Club\tFree\nWheel Arch Angels (Tuning)\tFree\nAmmunation\tFree\nCasino\tFree", "Select", "Cancel");
     return 1;
     }
 	if(strcmp(cmdtext, "/msgbox", true) == 0){
@@ -298,11 +309,20 @@ public OnPlayerPickUpPickup(playerid, pickupid)
 		pickuppickup[playerid] = 1;
 		ShowPlayerDialog(playerid, DIALOG_JOB_TRUCKER, DIALOG_STYLE_LIST, "Trucker", "Info\nMissions\nJoin", "Ok", "Cancel");
 	}
+	if(pickupid == paramedics){
+		SendClientMessage(playerid, SYS_OK, "Paramedics");
+	}
+	if(pickupid == sfnews){
+		SendClientMessage(playerid, SYS_OK, "SF news");
+	}
 	if(pickupid == sfairport){
 		SendClientMessage(playerid, SYS_OK, "SF Airport pickup");
 	}
 	if(pickupid == sftrain){
 		SendClientMessage(playerid, SYS_OK, "SF Train pickup");
+	}
+	if(pickupid == heal){
+		SendClientMessage(playerid, SYS_OK, "Heal yourself");
 	}
 	return 1;
 }
@@ -376,34 +396,92 @@ public OnVehicleStreamOut(vehicleid, forplayerid)
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(dialogid == DIALOG_JOBS){
+		new message[50];
+		format(message, sizeof(message), "[SYSTEM] Teleported to the job %s", inputtext);
 		if(response){
-			new message[50];
-			format(message, sizeof(message), "[SYSTEM] Teleported to the job %s", inputtext);
-			SetPlayerPos(playerid, -1736.7004,0.6265,10.2760);
-			SendClientMessage(playerid, SYS_OK, message);
+			switch(listitem){
+				case 0: {
+					SetPlayerPos(playerid, -1736.7004,0.6265,10.2760);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 1: {
+					SetPlayerPos(playerid, -2015.4547,64.9303,29.3113);
+					SetPlayerFacingAngle(playerid, 79.9318);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 2: {
+					SetPlayerPos(playerid, -1607.9023,721.3107,12.4011);
+					SetPlayerFacingAngle(playerid, 4.1442);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 3: {
+					SetPlayerPos(playerid, -1524.9471,502.1302,7.1797);
+					SetPlayerFacingAngle(playerid, 270.0349);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 4: {
+					SetPlayerPos(playerid, -1050.9052,-592.9783,32.0078);
+					SetPlayerFacingAngle(playerid, 253.4675);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 5: {
+					SetPlayerPos(playerid, -2491.1433,-623.3627,132.6505);
+					SetPlayerFacingAngle(playerid, 351.8257);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 6: {
+					SetPlayerPos(playerid, -2643.9480,635.5008,14.4531);
+					SetPlayerFacingAngle(playerid, 183.6865);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+			}
 		}
 	}
 	if(dialogid == DIALOG_TP){
-		new message[50];
+		new message[100];
 		format(message, sizeof(message), "[SYSTEM] Teleported to %s", inputtext);
-		switch(listitem){
-			case 0: {
-
-				SetPlayerPos(playerid, -1433.7793,-281.6175,14.1484);
-				SetPlayerFacingAngle(playerid, 136.1181);
-				SendClientMessage(playerid, SYS_OK, message);
-			}
-			case 1: {
-
-				SetPlayerPos(playerid, -1973.8416,159.3786,27.6940);
-				SetPlayerFacingAngle(playerid, 182.5750);
-				SendClientMessage(playerid, SYS_OK, message);
-			}
-			case 2: {
-				
-				SetPlayerPos(playerid, -2015.4547,64.9303,29.3113);
-				SetPlayerFacingAngle(playerid, 79.9318);
-				SendClientMessage(playerid, SYS_OK, message);
+		if(response){
+			switch(listitem){
+				case 0: {
+					SetPlayerPos(playerid, -1433.7793,-281.6175,14.1484);
+					SetPlayerFacingAngle(playerid, 136.1181);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 1: {
+					SetPlayerPos(playerid, -1973.8416,159.3786,27.6940);
+					SetPlayerFacingAngle(playerid, 182.5750);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 2:{
+					SetPlayerPos(playerid, -1904.8790,227.6518,35.1563);
+					SetPlayerFacingAngle(playerid, 79.3352);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 3:{
+					SetPlayerPos(playerid, -2131.2200,-444.1075,35.3359);
+					SetPlayerFacingAngle(playerid, 92.7817);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 4:{
+					SetPlayerPos(playerid, -2703.1890,-296.7828,7.1782);
+					SetPlayerFacingAngle(playerid, 47.7293);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 5:{
+					SetPlayerPos(playerid, -2712.7595,226.0923,4.3281);
+					SetPlayerFacingAngle(playerid, 267.5827);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 6: {
+					SetPlayerPos(playerid, -2617.9756,211.1030,4.8308);
+					SetPlayerFacingAngle(playerid, 1.6618);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 7: {
+					SetPlayerPos(playerid, -2398.4111,339.0851,35.1719);
+					SetPlayerFacingAngle(playerid, 228.8076);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
 			}
 		}
 		
