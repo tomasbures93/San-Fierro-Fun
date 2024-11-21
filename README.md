@@ -7,9 +7,6 @@ Server mod for <b>SA-MP v0.3.7-R2</b>
 <h2>Info</h2>
 Game mode is situated in a city called San Fierro.<br>
 
-<h2>Change log</h2>
-- Comming soon (First will be posted when gamemode is atleast a bit playable) .
-
 <h2>Features</h2>
 - Tutorial <br>
 - Jobs with Missions <br>
@@ -19,6 +16,9 @@ Game mode is situated in a city called San Fierro.<br>
 - Admin System <br>
 - VIP System <br>
 - Register System
+
+<h2>Change log</h2>
+- Comming soon (First will be posted with version <i>0.1.0a</i>)
 
 <h2>Commands</h2>
 - <b>/kill</b> - Kill yourself<br>
