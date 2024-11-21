@@ -21,5 +21,7 @@ Game mode is situated in a city called San Fierro.<br>
 - Comming soon (First will be posted with version <i>0.1.0a</i>)
 
 <h2>Commands</h2>
-<b>/jobs</b> - Teleport to the jobs around San Fierro<br>
-<b>/tp</b> - Teleports around the city <br>
+- <b>/kill</b> - Kill yourself<br>
+- <b>/tparound</b> - Teleports around the city <br>
+- <b>/tpjobs</b> - Teleports to jobs<br>
+- <b>/tphomes</b> - Teleports to the buildings you can buy <br>
