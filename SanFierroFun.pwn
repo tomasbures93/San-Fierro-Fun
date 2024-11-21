@@ -36,6 +36,7 @@ enum
     DIALOG_WEAPONS,
 	DIALOG_JOBS,
 	DIALOG_TP,
+	DIALOG_HOMES,
 	DIALOG_JOB_TRUCKER
 }
 #define DIALOG_LOGIN 1
@@ -198,12 +199,16 @@ public OnPlayerCommandText(playerid, cmdtext[])
         SetPlayerHealth(playerid, 0);
     return 1;
     }
-	if(strcmp(cmdtext, "/jobs", true) == 0){
+	if(strcmp(cmdtext, "/tpjobs", true) == 0){
         ShowPlayerDialog(playerid, DIALOG_JOBS, DIALOG_STYLE_TABLIST, "Job Teleports", "Trucker SF Docks\tNO REWARD\nFire Department\tNO REWARD\nPolice Station\tNO REWARD\nMilitary\tNO REWARD\nTrucker Petrol Tanks\tNO REWARD\nSan Fierro News\tNO REWARD\nParamedics\tNO REWARD", "Select", "Cancel");
     return 1;
     }
-	if(strcmp(cmdtext, "/tp", true) == 0){
-        ShowPlayerDialog(playerid, DIALOG_TP, DIALOG_STYLE_TABLIST, "Teleports", "San Fierro Airport\tFree\nSan Fierro Train Station\tFree\nRepair Shop (Train Station)\tFree\nStadium San Fierro\tFree\nGolf Club\tFree\nWheel Arch Angels (Tuning)\tFree\nAmmunation\tFree\nCasino\tFree", "Select", "Cancel");
+	if(strcmp(cmdtext, "/tphomes", true) == 0){
+        ShowPlayerDialog(playerid, DIALOG_HOMES, DIALOG_STYLE_TABLIST, "Teleports", "Pent House\tFree", "Select", "Cancel");
+    return 1;
+    }
+	if(strcmp(cmdtext, "/tparound", true) == 0){
+        ShowPlayerDialog(playerid, DIALOG_TP, DIALOG_STYLE_TABLIST, "Teleports", "San Fierro Airport\tFree\nSan Fierro Train Station\tFree\nRepair Shop (Train Station)\tFree\nStadium San Fierro\tFree\nGolf Club\tFree\nWheel Arch Angels (Tuning)\tFree\nAmmunation\tFree\nCasino\tFree\nStrip Club\tFree", "Select", "Cancel");
     return 1;
     }
 	if(strcmp(cmdtext, "/msgbox", true) == 0){
@@ -437,6 +442,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
+	if(dialogid == DIALOG_HOMES){
+		new message[50];
+		format(message, sizeof(message), "[SYSTEM] Teleported to %s", inputtext);
+		if(response){
+			switch(listitem){
+				case 0: {
+					SetPlayerPos(playerid, -1763.8490,945.1058,24.8828);
+					SetPlayerFacingAngle(playerid, 172.6582);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+			}
+		}
+	}
 	if(dialogid == DIALOG_TP){
 		new message[100];
 		format(message, sizeof(message), "[SYSTEM] Teleported to %s", inputtext);
@@ -480,6 +498,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 7: {
 					SetPlayerPos(playerid, -2398.4111,339.0851,35.1719);
 					SetPlayerFacingAngle(playerid, 228.8076);
+					SendClientMessage(playerid, SYS_OK, message);
+				}
+				case 8: {
+					SetPlayerPos(playerid, -2606.6348,1406.0270,7.1782);
+					SetPlayerFacingAngle(playerid, 126.6761);
 					SendClientMessage(playerid, SYS_OK, message);
 				}
 			}
