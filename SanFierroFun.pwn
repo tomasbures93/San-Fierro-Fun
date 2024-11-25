@@ -125,7 +125,7 @@ public OnPlayerRequestClass(playerid, classid)
 	SetPlayerFacingAngle(playerid, 277.2402);
 	SetPlayerCameraPos(playerid,-1158.2056,30.9412,14.1484);
 	SetPlayerCameraLookAt(playerid,-1166.0553,30.2264,14.1484);
-	ShowPlayerDialog(playerid, DIALOG_WELCOME, DIALOG_STYLE_MSGBOX, "Welcome to the server", "Rules:\n1) Dont Cheat\n2) Be Polite\n3) Have Fun\nLine1\nLine2", "OK", "");
+	ShowPlayerDialog(playerid, DIALOG_WELCOME, DIALOG_STYLE_MSGBOX, "Welcome to the server", "Rules:\n1) Dont Cheat\n2) Be Polite\n3) Have Fun", "OK", "");
 	return 1;
 }
 
