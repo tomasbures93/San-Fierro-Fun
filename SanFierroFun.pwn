@@ -1,6 +1,7 @@
 #include <a_samp>
 
 new modversion[20] = "v0.0.4a";
+new update[20] = "06.01.2025";
 
 #pragma tabsize 0
 
@@ -16,18 +17,17 @@ new Text:Test;
 
 // Player stats
 enum PStats {
-	admin = 0,
-	vip = 0,
-	level = 0,
-	playerxp = 0,
-	money = 0,
-	reputation = 0,
-	health = 0,
-	vest = 0,
-	job = 0
+	admin,
+	vip,
+	level,
+	playerxp,
+	money,
+	reputation,
+	health,
+	vest,
+	job
 }
 new PlayerStats[MAX_PLAYERS][PStats];
-new freshlogin[MAX_PLAYERS];
 
 // pickups - transport
 new sfairport;
@@ -60,8 +60,10 @@ enum
 
 main()
 {
+	new msg[128];
+	format(msg, sizeof(msg), "San Fierro Fun: %s | Last update: %s", modversion, update);
 	print("\n----------------------------------");
-	print(" San Fierro Fun");
+	print(msg);
 	print("----------------------------------\n");
 }
 
@@ -153,7 +155,15 @@ public OnPlayerConnect(playerid)
 	// Variables
 	jobpickup[playerid] = 0;
 	pickuppickup[playerid] = 0;
-	freshlogin[playerid] = 0;
+	PlayerStats[playerid][admin] = 0;
+	PlayerStats[playerid][vip] = 0;
+	PlayerStats[playerid][level] = 1;
+	PlayerStats[playerid][playerxp] = 0;
+	PlayerStats[playerid][money] = 0;
+	PlayerStats[playerid][reputation] = 0;
+	PlayerStats[playerid][health] = 100;
+	PlayerStats[playerid][vest] = 0;
+	PlayerStats[playerid][job] = 0;
 	// Map Icons
 	SetPlayerMapIcon(playerid, 1, -1732.1434,36.2360,3.5547, 51, SYS_WHITE, 1);		// SF docks trucker
 	SetPlayerMapIcon(playerid, 2, -1423.3116,-289.1021,14.1484, 5, SYS_WHITE, 1);	// airport
@@ -177,21 +187,10 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	if(freshlogin[playerid] == 0){
-		PlayerStats[playerid][admin] = 0;
-		PlayerStats[playerid][vip] = 0;
-		PlayerStats[playerid][level] = 1;
-		PlayerStats[playerid][playerxp] = 0;
-		PlayerStats[playerid][money] = 0;
-		PlayerStats[playerid][reputation] = 0;
-		PlayerStats[playerid][health] = 100;
-		PlayerStats[playerid][vest] = 0;
-		PlayerStats[playerid][job] = 0;
-		freshlogin[playerid] = 1;
-	}
     SetPlayerPos(playerid, -1973.8416,159.3786,27.6940);
 	SetPlayerFacingAngle(playerid, 182.5750);
 	GivePlayerMoney(playerid, 1000);
+	SetPlayerScore(playerid, PlayerStats[playerid][level]);
 	return 1;
 }
 
@@ -238,6 +237,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
         SetPlayerArmour(playerid, 100);
     return 1;
     }
+	if (strcmp(cmdtext, "/resetserver", true) == 0) {
+        SendRconCommand("gmx");
+        SendClientMessageToAll(0xFF0000FF, "Server is being reset by an admin!");
+    return 1;
+}
 	if(strcmp(cmdtext, "/mystats", true) == 0){
         GetPlayerStats(playerid);
     return 1;
@@ -643,21 +647,14 @@ public pickupreset(playerid) {
 forward GetPlayerStats(playerid);
 public GetPlayerStats(playerid){
 	new Float: hp, Float: vesta;
-	PlayerStats[playerid][admin] = PlayerStats[playerid][admin];
-	PlayerStats[playerid][vip] = PlayerStats[playerid][vip];
-	PlayerStats[playerid][level] = GetPlayerScore(playerid);
-	PlayerStats[playerid][playerxp] = PlayerStats[playerid][playerxp];
-	PlayerStats[playerid][money] = GetPlayerMoney(playerid);
-	PlayerStats[playerid][reputation] = PlayerStats[playerid][reputation];
-	PlayerStats[playerid][health] = GetPlayerHealth(playerid, hp);
-	PlayerStats[playerid][vest] = GetPlayerArmour(playerid, vesta);
-	PlayerStats[playerid][job] = PlayerStats[playerid][job];
 	new string[128], name[MAX_PLAYER_NAME], string2[128], string3[128], string4[128];
 	new ping = GetPlayerPing(playerid);
+	GetPlayerHealth(playerid, hp);
+	GetPlayerArmour(playerid, vesta);
 	GetPlayerName(playerid, name, sizeof(name));
 	format(string, sizeof(string), "Stats of player %s (ID: %d)", name, playerid);
 	format(string2, sizeof(string), "Admin: %d | VIP: %d | Level: %d | XP: %d | Reputation: %d", PlayerStats[playerid][admin], PlayerStats[playerid][vip], PlayerStats[playerid][level], PlayerStats[playerid][playerxp], PlayerStats[playerid][reputation]);
-    format(string3, sizeof(string), "Money: %d | HP: %d | Armour: %d | JobID: %d", PlayerStats[playerid][money], PlayerStats[playerid][health], PlayerStats[playerid][vest], PlayerStats[playerid][job]);
+    format(string3, sizeof(string), "Money: %d | HP: %.1f | Armour: %.1f | JobID: %d", GetPlayerMoney(playerid), hp, vesta, PlayerStats[playerid][job]);
 	format(string4, sizeof(string), "Ping: %d", ping);
 	SendClientMessage(playerid, SYS_OK, string);
 	SendClientMessage(playerid, SYS_OK, string2);
